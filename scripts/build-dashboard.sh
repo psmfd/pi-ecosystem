@@ -85,8 +85,24 @@ ALIAS_MAP="$WORK/alias.tsv"
 
 n_repos="$(awk 'END {print NR}' "$ALIAS_MAP")"
 info "querying latest release + commit SHA for $n_repos repos"
-gh api graphql -f query="$(cat "$WORK/query.graphql")" > "$WORK/releases.json" \
-  || { err "releases" "graphql release query failed"; exit 1; }
+# gh exits non-zero if ANY aliased repo errors (e.g. a private repo the token
+# cannot read), but still writes the full `data` object to stdout with the
+# accessible repos populated and the rest null. Capture it and decide on the
+# body, not the exit code: a per-repo NOT_FOUND is non-fatal (that repo simply
+# renders without release data); only an absent `data` object is fatal.
+set +e
+gh api graphql -f query="$(cat "$WORK/query.graphql")" > "$WORK/releases.json" 2>"$WORK/releases.err"
+set -e
+if ! jq -e 'has("data") and (.data != null)' "$WORK/releases.json" >/dev/null 2>&1; then
+  err "releases" "graphql release query returned no usable data"
+  [ -s "$WORK/releases.err" ] && while IFS= read -r line; do detail "$line"; done < "$WORK/releases.err"
+  exit 1
+fi
+# Surface per-repo errors (typically private repos the CI token cannot read) as
+# warnings — the dashboard still publishes with those repos degraded.
+while IFS= read -r msg; do
+  [ -n "$msg" ] && warn "releases" "$msg"
+done < <(jq -r '(.errors // [])[] | .message' "$WORK/releases.json")
 
 # alias -> name map as JSON
 jq -R 'split("\t") | {alias: .[0], name: .[1]}' "$ALIAS_MAP" | jq -s '.' > "$WORK/aliasmap.json"

@@ -32,7 +32,9 @@ def card:
              + "\" title=\"" + (if $r.source == "tag" then "git tag (no GitHub release)" else "GitHub release" end)
              + "\">" + ($r.tag | esc) + "</span>"
              + "<span class=\"date\">" + ($r.date | reldate) + "</span></div>"
-        else "<div class=\"rel\"><span class=\"pill pill-none\">no release yet</span></div>"
+        else "<div class=\"rel\"><span class=\"pill pill-none\">"
+             + (if $private then "private" else "no release yet" end)
+             + "</span></div>"
         end )
     + ( if $r.sha != null
         then "<button class=\"sha\" type=\"button\" data-full=\"" + ($r.sha | esc) + "\" "
