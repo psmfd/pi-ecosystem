@@ -37,9 +37,13 @@ Projects v2 is GraphQL-only and **always requires authentication**, even for a
 public project. The default Actions `GITHUB_TOKEN` does **not** carry
 `read:project` scope, so a PAT is required:
 
-1. Create a **fine-grained PAT** — Resource owner `psmfd`, permissions
-   **Projects: Read-only** and **Contents: Read-only**. (Contents access lets
-   release/tag data resolve for the private repos in the catalog.)
+1. Create a **fine-grained PAT** — Resource owner `psmfd`, permission
+   **Projects: Read-only** (required to read the board). Private repos in the
+   catalog are intentionally **masked** — they render with a 🔒 and a "private"
+   pill, and no version/SHA is published. The build tolerates repos the token
+   cannot read (logs a warning, keeps going). If you ever want a private repo's
+   release + SHA shown publicly, additionally grant **Contents: Read-only**
+   including that repo; otherwise it stays masked.
 2. Store it as a repo secret (run it yourself so the value never lands in a
    file or this repo's history):
 
