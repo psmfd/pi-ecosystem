@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d;
+    --fg: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --pill: #1f6feb; --pill-tag: #6e7681; --pill-none: #484f58;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f8fa; --panel: #ffffff; --border: #d0d7de;
+      --fg: #1f2328; --muted: #636c76; --accent: #0969da;
+      --pill: #0969da; --pill-tag: #6e7681; --pill-none: #afb8c1;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+  header h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
+  header .desc { color: var(--muted); margin: 0 0 .5rem; }
+  header .updated { color: var(--muted); font-size: .8rem; }
+  .cat { margin-top: 2rem; }
+  .cat h2 {
+    font-size: .85rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    padding-bottom: .4rem; margin: 0 0 1rem;
+  }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: .5rem;
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+  .name { font-weight: 600; color: var(--accent); text-decoration: none; word-break: break-word; }
+  a.name:hover { text-decoration: underline; }
+  .vis { font-size: .9rem; }
+  .rel { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .pill {
+    background: var(--pill); color: #fff; border-radius: 2em;
+    padding: .1rem .6rem; font-size: .8rem; font-weight: 600;
+  }
+  .pill-tag { background: var(--pill-tag); }
+  .pill-none { background: var(--pill-none); }
+  .date { color: var(--muted); font-size: .8rem; }
+  .sha {
+    align-self: flex-start; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .78rem; color: var(--muted); background: transparent;
+    border: 1px solid var(--border); border-radius: 6px; padding: .15rem .5rem;
+    cursor: pointer;
+  }
+  .sha:hover { color: var(--fg); border-color: var(--accent); }
+  .sha.copied { color: #3fb950; border-color: #3fb950; }
+  .desc { color: var(--muted); margin: 0; font-size: .9rem; }
+  footer { margin-top: 2.5rem; color: var(--muted); font-size: .8rem; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>{{TITLE}}</h1>
+    <p class="desc">{{DESC}}</p>
+    <p class="updated">Updated {{UPDATED}} · pin any repo by the commit SHA shown on its card</p>
+  </header>
+  <main>
+{{CARDS}}
+  </main>
+  <footer>
+    Generated from the <a href="{{BOARD_URL}}">Pi Ecosystem project board</a>.
+    Release SHAs are immutable — prefer them over tags/branches when pinning.
+  </footer>
+</div>
+<script>
+  document.querySelectorAll('.sha').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var full = el.getAttribute('data-full');
+      navigator.clipboard.writeText(full).then(function () {
+        var prev = el.textContent;
+        el.textContent = '✓ copied ' + full.slice(0, 7);
+        el.classList.add('copied');
+        setTimeout(function () { el.textContent = prev; el.classList.remove('copied'); }, 1200);
+      });
+    });
+  });
+</script>
+</body>
+</html>
