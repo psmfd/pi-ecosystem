@@ -138,12 +138,30 @@ jq --slurpfile rel "$WORK/releases-by-name.json" '
     )
 ' "$WORK/catalog.json" > "$WORK/merged.json"
 
-# --- 5. render page from template (bash // replacement is safe with & and /) ---
+# --- 5. render page from template ---
+# In ${var//pat/repl}, bash treats `&` in the *replacement* as the matched text
+# and `\` as an escape (literal & is `\&`, literal \ is `\\`). `/` is NOT special
+# in the replacement. So board content (title/description) or generated HTML that
+# contains `&` would otherwise substitute as the matched token (e.g. `{{TITLE}}`).
+# esc_repl escapes a named variable in place so it substitutes literally.
+esc_repl() {  # $1 = name of variable to escape (in place)
+  local v=${!1}
+  v=${v//\\/\\\\}   # backslash first, so we don't double-escape the & escapes
+  v=${v//&/\\&}
+  printf -v "$1" '%s' "$v"
+}
+
 title="$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json --jq '.title' 2>/dev/null || echo "Repo Catalog")"
 desc="$(gh project view "$PROJECT_NUMBER" --owner "$OWNER" --format json --jq '.shortDescription' 2>/dev/null || echo "")"
 updated="$(date -u '+%Y-%m-%d %H:%M UTC')"
 board_url="https://github.com/orgs/$OWNER/projects/$PROJECT_NUMBER"
 cards="$(jq -r -f "$SCRIPT_DIR/render.jq" "$WORK/merged.json")"
+
+esc_repl cards
+esc_repl title
+esc_repl desc
+esc_repl updated
+esc_repl board_url
 
 mkdir -p "$OUT_DIR"
 template="$(cat "$ROOT/templates/page.html")"

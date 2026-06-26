@@ -26,6 +26,18 @@
   header h1 { margin: 0 0 .25rem; font-size: 1.75rem; }
   header .desc { color: var(--muted); margin: 0 0 .5rem; }
   header .updated { color: var(--muted); font-size: .8rem; }
+  .about {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1.5rem;
+  }
+  .about p { margin: 0 0 .6rem; }
+  .about p:last-child { margin-bottom: 0; }
+  .about .lead { color: var(--muted); }
+  .about code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85em; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 4px; padding: .05rem .3rem;
+  }
   .cat { margin-top: 2rem; }
   .cat h2 {
     font-size: .85rem; text-transform: uppercase; letter-spacing: .06em;
@@ -36,6 +48,11 @@
   .card {
     background: var(--panel); border: 1px solid var(--border);
     border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: .5rem;
+  }
+  .card.entry { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .entry-badge {
+    background: var(--accent); color: #fff; border-radius: 2em;
+    padding: .1rem .55rem; font-size: .72rem; font-weight: 600; white-space: nowrap;
   }
   .card-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
   .name { font-weight: 600; color: var(--accent); text-decoration: none; word-break: break-word; }
@@ -69,6 +86,10 @@
     <p class="desc">{{DESC}}</p>
     <p class="updated">Updated {{UPDATED}} · pin any repo by the commit SHA shown on its card</p>
   </header>
+  <section class="about">
+    <p><strong>The Pi Ecosystem</strong> is a set of repositories that together deliver the Pi runtime and its configuration — the core runtime and source, mirrored config and extension distributions, and the supporting services around them. Each repo below is listed with its latest release and an immutable commit SHA, so you can pin to an exact build rather than a moving tag or branch.</p>
+    <p class="lead">New here? Start with <code>pi_config</code> — the installation and configuration entry point for standing up the ecosystem.</p>
+  </section>
   <main>
 {{CARDS}}
   </main>
