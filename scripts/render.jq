@@ -18,11 +18,20 @@ def reldate:  if . == null then "—" else .[0:10] end;
 def card:
   . as $r
   | ($r.visibility == "Private") as $private
-  | "<article class=\"card\">"
+  # Identify the installation/configuration entry point by URL slug (the
+  # canonical repo name), not the display title — avoids the pi-config/pi_config
+  # ambiguity and survives a board title rename. pi-config (hyphen) is the
+  # PUBLIC config-distribution mirror, the consumer entry point — not the
+  # private pi_config (underscore) source monorepo.
+  | (($r.url // "") | split("/") | .[4] // "") as $slug
+  | ($slug == "pi-config") as $entry
+  | "<article class=\"card" + (if $entry then " entry" else "" end) + "\">"
     + "<div class=\"card-head\">"
     + ( if $private then "<span class=\"name\">" + ($r.name | esc) + "</span>"
         else "<a class=\"name\" href=\"" + ($r.url | esc) + "\">" + ($r.name | esc) + "</a>"
         end )
+    + ( if $entry then "<span class=\"entry-badge\" title=\"Installation and configuration entry point\">★ Start here</span>"
+        else "" end )
     + ( if $private then "<span class=\"vis\" title=\"Private\">🔒</span>"
         else "<span class=\"vis\" title=\"Public\">🌐</span>" end )
     + "</div>"
