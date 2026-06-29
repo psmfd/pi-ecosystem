@@ -41,8 +41,12 @@ def card:
              + "\" title=\"" + (if $r.source == "tag" then "git tag (no GitHub release)" else "GitHub release" end)
              + "\">" + ($r.tag | esc) + "</span>"
              + "<span class=\"date\">" + ($r.date | reldate) + "</span></div>"
-        else "<div class=\"rel\"><span class=\"pill pill-none\">"
-             + (if $private then "private" else "no release yet" end)
+        else "<div class=\"rel\"><span class=\"pill pill-none\""
+             + (if $private
+                then " title=\"Private repository — its release version is not published to this public dashboard\""
+                else "" end)
+             + ">"
+             + (if $private then "private — version not shown" else "no release yet" end)
              + "</span></div>"
         end )
     + ( if $r.sha != null

@@ -10,8 +10,14 @@ name: dashboard
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # every 6 hours
+    - cron: "0 * * * *"     # hourly (safety net; release.yml dispatch refreshes instantly)
   workflow_dispatch:
+  # Fired by psmfd/pi_config's release.yml right after a release is cut, so the
+  # dashboard reflects the new version immediately instead of waiting for the
+  # 6-hourly cron. Sender must hold a token scoped to this repo (the org
+  # mirror-sync App with pi-ecosystem in its installation, ADR-0061/0064).
+  repository_dispatch:
+    types: [release-published]
 
 permissions:
   contents: read
