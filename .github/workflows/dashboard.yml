@@ -10,7 +10,7 @@ name: dashboard
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # every 6 hours (safety net)
+    - cron: "0 * * * *"     # hourly (safety net; release.yml dispatch refreshes instantly)
   workflow_dispatch:
   # Fired by psmfd/pi_config's release.yml right after a release is cut, so the
   # dashboard reflects the new version immediately instead of waiting for the
